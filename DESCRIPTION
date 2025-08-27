@@ -14,3 +14,4 @@ Depends: ggplot2, grid, gridExtra
 SystemRequirements: NLopt
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
+URL: https://michaelbarkasi.github.io/wispack/

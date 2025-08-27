@@ -9,3 +9,4 @@ wispack.Rcheck/*
 *.Rcheck/*
 man/*
 !.gitattributes
+docs
