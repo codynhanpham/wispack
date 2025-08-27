@@ -1,4 +1,3 @@
-.*
 *.Rproj
 src/*.o
 src/*.so
@@ -8,5 +7,8 @@ Read-and-delete-me
 wispack.Rcheck/*
 *.Rcheck/*
 man/*
+.Rbuildignore
+.RData
+.Rhistory
 !.gitattributes
 docs
