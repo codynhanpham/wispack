@@ -10,7 +10,7 @@ Description: WSPmm are intended for hypothesis testing of spatially or temporall
 License: GPL (>= 3)
 Imports: Rcpp (>= 1.0.13-1), RcppEigen, methods, dtwclust
 LinkingTo: Rcpp, RcppEigen, StanHeaders, BH
-Depends: ggplot2, grid, gridExtra
+Depends: ggplot2, grid, gridExtra, colorspace
 SystemRequirements: NLopt
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
