@@ -11,4 +11,3 @@ man/*
 .RData
 .Rhistory
 !.gitattributes
-docs
