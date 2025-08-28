@@ -1,8 +1,9 @@
 pandoc: '3.4'
 pkgdown: 2.1.3
 pkgdown_sha: ~
-articles: {}
-last_built: 2025-08-28T19:37Z
+articles:
+  license: license.html
+last_built: 2025-08-28T22:34Z
 urls:
   reference: https://michaelbarkasi.github.io/wispack/reference
   article: https://michaelbarkasi.github.io/wispack/articles
