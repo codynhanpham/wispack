@@ -26,7 +26,8 @@ rm -f wispack_*.tar.gz
 ## Build documentation
 
 In R, run: 
-pkgdown::build_site_github_pages()
+devtools::document()  # regenerates .Rd files in man/
+pkgdown::build_site()
 
 ### Linux
 On Linux (Ubuntu/Debian), additional system dependencies are required *before* the building process: 

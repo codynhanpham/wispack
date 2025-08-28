@@ -1,44 +1,35 @@
+url: https://michaelbarkasi.github.io/wispack/
 template:
   bootstrap: 5
-  light-switch: true
-  
+  light-switch: yes
 navbar:
   structure:
-    left:  [intro, reference, articles, tutorials, news]
-    right: [search, github, lightswitch]
+    left:
+    - intro
+    - reference
+    - articles
+    - tutorials
+    right:
+    - search
+    - github
+    - lightswitch
   components:
     intro:
-      text: "Introduction"
+      text: Intro
       href: index.html
     reference:
-      text: "Reference"
+      text: Functions
       href: reference/index.html
     articles:
-      text: "Articles"
+      text: Articles
       href: articles/index.html
     tutorials:
-      text: "Tutorials"
+      text: Tutorials
       href: articles/tutorials.html
-    news:
-      text: "News"
-      href: news/index.html
     github:
       icon: fab fa-github
       href: https://github.com/your/repo
     lightswitch:
-      text: "🌙"
-      href: "#"
+      text: "\U0001F319"
+      href: '#'
 
-reference:
-  - title: "All functions"
-    contents:
-      - starts_with("")
-
-articles:
-  - title: "Getting started"
-    contents:
-      - intro
-  - title: "Advanced topics"
-    contents:
-      - tricks
-      - internals
