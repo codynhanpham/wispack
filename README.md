@@ -19,6 +19,11 @@ rm -f wispack_*.tar.gz
 ./build_install.sh
 ```
 
+## Build documentation
+
+In R, run: 
+pkgdown::build_site_github_pages()
+
 ### Linux
 On Linux (Ubuntu/Debian), additional system dependencies are required *before* the building process: 
 - `libxml2` for roxygen2
