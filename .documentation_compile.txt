@@ -1,5 +1,5 @@
 ## Build documentation
 
 In R, run: 
-devtools::document()  # regenerates .Rd files in man/
+devtools::document()  
 pkgdown::build_site()
