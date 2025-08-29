@@ -6,7 +6,6 @@ Read-and-delete-me
 .Rproj.user
 wispack.Rcheck/*
 *.Rcheck/*
-man/*
 .Rbuildignore
 .RData
 .Rhistory
