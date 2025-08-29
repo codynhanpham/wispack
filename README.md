@@ -10,7 +10,7 @@ Preprint: https://doi.org/10.1101/2025.06.11.659209
 Copyright (C) 2025, Michael Barkasi
 barkasi@wustl.edu
 
-![(Top:) Horizontal slice from mouse pup with right sensorimotor cortex and RORB spots as measured by MERFISH. (Bottom:) wisp model fit to this data showing RORB upregulated in L4 with effects from age and hemisphere.](reference/figures/fig_Rorb_stacked.png)
+![(Top:) Horizontal slice from mouse pup with right sensorimotor cortex and RORB spots as measured by MERFISH. (Bottom:) wisp model fit to this data showing RORB upregulated in L4 with effects from age and hemisphere.](man/figures/fig_Rorb_stacked.png)
 
 # Installation 
 
