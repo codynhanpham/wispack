@@ -33,7 +33,7 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="active nav-item"><a class="nav-link" href="index.html">Intro</a></li>
-<li class="nav-item"><a class="nav-link" href="articles/index.html">Articles</a></li>
+<li class="nav-item"><a class="nav-link" href="articles/install.html">Installation</a></li>
 <li class="nav-item"><a class="nav-link" href="articles/tutorials.html">Tutorials</a></li>
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Functions</a></li>
 <li class="nav-item"><a class="nav-link" href="articles/license.html">Legal</a></li>
@@ -54,53 +54,83 @@
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header"><h1 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h1></div>
-<p>Wispack (pronounced “wisp package” or “wisp pack”) is an R package for testing for between-group effects on spatial variation in spatial transcriptomics data. Unlike mere SVG testing (spatially variable gene) which only involves testing for spatial variation of gene expression within a group, wispack allows for testing whether a factor such as age or rearing conditions has a nonzero effect on spatial variation between groups differing on that factor.</p>
-<p>Wispack performs this testing by first using change-point detection to find spatial variation in samples, then fitting a nonlinear mixed-effect model to the detected change points. The core of the nonlinear model is a parameterization of the found change-points as inflections in logistic functions representing gradients of gene expression change. Multiple change-points are handled by summing the component logistic functions into a “poly-sigmoid” function. Fixed effects (such as age or rearing conditions) are then modeled as effects on the underlying logistic parameters. Random (within group) effects are modeled as further nonlinear warping of the poly-sigmoid. Significance testing is performed on the effects through either bootstrapping or MCMC resampling.</p>
-<p>Preprint: <a href="https://doi.org/10.1101/2025.06.11.659209" class="external-link uri">https://doi.org/10.1101/2025.06.11.659209</a></p>
-<p>Copyright (C) 2025, Michael Barkasi <a href="mailto:barkasi@wustl.edu" class="email">barkasi@wustl.edu</a></p>
-<div class="float">
-<img src="reference/figures/fig_Rorb_stacked.png" alt="(Top:) Horizontal slice from mouse pup with right sensorimotor cortex and RORB spots as measured by MERFISH. (Bottom:) wisp model fit to this data showing RORB upregulated in L4 with effects from age and hemisphere."><div class="figcaption">(Top:) Horizontal slice from mouse pup with right sensorimotor cortex and RORB spots as measured by MERFISH. (Bottom:) wisp model fit to this data showing RORB upregulated in L4 with effects from age and hemisphere.</div>
+<p>Wispack (pronounced “wisp package” or “wisp pack”) is an R package for testing for between-group effects on spatial variation in spatial transcriptomics data, i.e., functional spatial effects (FSE).</p>
+<div class="figure">
+<img src="reference/figures/stack_0_1475_L1_truecolor.png" alt="True-color MERFISH image" width="50%"><p class="caption">
+True-color image of fluorescing probes bound to mRNA molecules in cortical cells, the raw data of spatial transcriptomics.
+</p>
 </div>
+<p>Unlike SVG testing (spatially variable gene) which only involves testing for spatial variation of gene expression within a group, and unlike differential expression (DE) analysis which tests for between-group effects without regard to spatial distribution, testing for FSE involves testing whether a factor such as age or rearing conditions has a nonzero effect on spatial variation between groups differing on that factor.</p>
+<div class="figure">
+<img src="reference/figures/fig_FSE.png" alt="DE vs SVG vs FSE" width="90%"><p class="caption">
+Comparison between testing for differentially expressed genes, spatially variable genes, and genes with function spatial effects. For visualization purposes, mouse brain slices represent the
+</p>
 </div>
-<div class="section level1">
-<h1 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
-</h1>
-<ol style="list-style-type: decimal">
-<li>Clone and <code>cd</code> into this git repo</li>
-<li>Make <code>build_install.sh</code> executable by running <code>chmod +x build_install.sh</code> in bash terminal<br>
-</li>
-<li>In terminal, run <code>./build_install.sh</code> to build and install the package<br>
-</li>
-<li>To ensure a clean start, run:</li>
-</ol>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">rm</span> <span class="at">-f</span> src/<span class="pp">*</span>.o src/<span class="pp">*</span>.so  </span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">rm</span> <span class="at">-rf</span> wispack.Rcheck  </span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">rm</span> <span class="at">-f</span> wispack_<span class="pp">*</span>.tar.gz  </span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="ex">./build_install.sh</span></span></code></pre></div>
-<div class="section level2">
-<h2 id="linux">Linux<a class="anchor" aria-label="anchor" href="#linux"></a>
-</h2>
-<p>On Linux (Ubuntu/Debian), additional system dependencies are required <em>before</em> the building process: - <code>libxml2</code> for roxygen2 - <code>r-base-dev</code>, <code>libnlopt-dev</code> (or <code>libnlopt-cxx-dev</code>) for Rcpp, RcppEigen, and StanHeaders</p>
-<p>For PDF documentation generation, <code>pdflatex</code> should also be installed</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">sudo</span> apt install <span class="dt">\</span></span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>    libxml2 <span class="dt">\</span></span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>    r-base-dev <span class="dt">\</span></span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>    libnlopt-dev <span class="dt">\</span></span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>    libnlopt-cxx-dev <span class="dt">\</span></span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>    texlive-latex-base <span class="dt">\</span></span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>    texlive-fonts-recommended <span class="dt">\</span></span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>    texlive-fonts-extra <span class="dt">\</span></span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>    texlive-latex-extra</span></code></pre></div>
+<p>Wispack performs FSE testing by first using change-point detection to find spatial variation in samples, then fitting a nonlinear mixed-effect model to the detected change points. The core of the nonlinear model is a parameterization of the found change-points as inflections in logistic functions representing gradients of gene expression change. Multiple change-points are handled by summing the component logistic functions into a “poly-sigmoid” function. Fixed effects (such as age or rearing conditions) are then modeled as effects on the underlying logistic parameters. Random (within group) effects are modeled as further nonlinear warping of the poly-sigmoid. Significance testing is performed on the effects through either bootstrapping or MCMC resampling. A complete technical description of wisp models can be found in this <a href="https://doi.org/10.1101/2025.06.11.659209" class="external-link">preprint</a>.</p>
+<div class="figure">
+<img src="reference/figures/fig_WSPfunctions.png" alt="Demo plots of functions involved in wisp" width="90%"><p class="caption">
+Demo plots of the functions involved in wisp. (A) The logistic function, used to model a single change point in gene expression. (B) The wisp poly-sigmoid function, built from three logistic components, representing three change points. (C) The warping function used to represent random effects, e.g., variation due to differences between individual animals or due to measurement noise. (D) The wisp poly-sigmoid from (B) with warping function applied.
+</p>
 </div>
+<p>Wispack provides a simple user-facing function, wisp(), which takes a data frame in the familiar format expected by standard R functions for linear models (e.g., lm() and lmer()) and runs the complete test for FSEs. Preprocessing of the data is generally required before passing it to wisp(), after which wisp() executes a pipeline involving parameter estimates, prediction, model fitting, and hypothesis testing.</p>
+<div class="figure">
+<img src="reference/figures/fig_modelpipeline_simple.png" alt="Diagram of top-level of wisp modeling pipeline" width="90%"><p class="caption">
+Top-level overview of wisp modeling pipeline.
+</p>
 </div>
-<div class="section level1">
-<h1 id="demos">Demos<a class="anchor" aria-label="anchor" href="#demos"></a>
-</h1>
+<p>As shown by the figure below, the steps of this pipeline are nonlinear and recurrent.</p>
+<div class="figure">
+<img src="reference/figures/fig_modelpipeline.png" alt="Diagram of full modeling pipeline" width="90%"><p class="caption">
+Full modeling pipeline for wisp. Boxes represent variables in the model, or operations performed on variables. Arrows represent input-output relationships between these variables and operations.
+</p>
+</div>
+<p>Unlike standard linear modeling packages in R which require a model formula, wisp() merely needs the data. For example, the quick-start demo (which uses data on RORB expression across the laminar axis of the primary somatosensory cortex) runs the following code:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Set random seed for reproducibility</span></span>
+<span><span class="va">ran.seed</span> <span class="op">&lt;-</span> <span class="fl">123</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="va">ran.seed</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Load wispack</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://michaelbarkasi.github.io/wispack/">wispack</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Load demo data</span></span>
+<span><span class="va">countdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span></span>
+<span>  <span class="st">"extdata"</span>, </span>
+<span>  <span class="st">"S1_laminar_countdata_demo_default_col_names.csv"</span>, </span>
+<span>  package <span class="op">=</span> <span class="st">"wispack"</span></span>
+<span>  <span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Fit model</span></span>
+<span><span class="va">laminar.model</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/wisp.html">wisp</a></span><span class="op">(</span><span class="va">countdata</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># View model </span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/View.html" class="external-link">View</a></span><span class="op">(</span><span class="va">laminar.model</span><span class="op">)</span></span></code></pre></div>
+<p>No model formula is required, as all wisp models have the same mathematical form. However, the variables involved in that form can, of course, have different names. These names will come from the column names of the data and can be set manually by the user, as so:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Define variables in the dataframe for the model</span></span>
+<span><span class="va">data.variables</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    count <span class="op">=</span> <span class="st">"count"</span>,</span>
+<span>    bin <span class="op">=</span> <span class="st">"bin"</span>, </span>
+<span>    parent <span class="op">=</span> <span class="st">"cortex"</span>, </span>
+<span>    child <span class="op">=</span> <span class="st">"gene"</span>,</span>
+<span>    ran <span class="op">=</span> <span class="st">"mouse"</span>,</span>
+<span>    fixedeffects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"hemisphere"</span>, <span class="st">"age"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span>  </span>
+<span><span class="co"># Fit model</span></span>
+<span><span class="va">laminar.model</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/wisp.html">wisp</a></span><span class="op">(</span></span>
+<span>    <span class="co"># Data to model</span></span>
+<span>    count.data <span class="op">=</span> <span class="va">countdata</span>,</span>
+<span>    <span class="co"># Variable labels</span></span>
+<span>    variables <span class="op">=</span> <span class="va">data.variables</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
+<p>Both the quick-start demo and another demo showing all model options can be run using the demo() command:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/demo.html" class="external-link">demo</a></span><span class="op">(</span><span class="st">"quick_start"</span>, package <span class="op">=</span> <span class="st">"wispack"</span><span class="op">)</span>  </span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/demo.html" class="external-link">demo</a></span><span class="op">(</span><span class="st">"full_options"</span>, package <span class="op">=</span> <span class="st">"wispack"</span><span class="op">)</span></span></code></pre></div>
+<p>Please see the tutorials for more detailed walkthroughs of the package and its options.</p>
+<p>Copyright (C) 2025, Michael Barkasi <a href="mailto:barkasi@wustl.edu" class="email">barkasi@wustl.edu</a></p>
 </div>
-
   </main><aside class="col-md-3"><div class="license">
 <h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">

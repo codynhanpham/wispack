@@ -6,7 +6,7 @@ navbar:
   structure:
     left:
     - intro
-    - articles
+    - install
     - tutorials
     - reference
     - license
@@ -18,9 +18,9 @@ navbar:
     intro:
       text: Intro
       href: index.html
-    articles:
-      text: Articles
-      href: articles/index.html
+    install:
+      text: Installation
+      href: articles/install.html
     tutorials:
       text: Tutorials
       href: articles/tutorials.html

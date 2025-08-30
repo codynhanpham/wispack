@@ -10,3 +10,17 @@
 .page-header {
   border-bottom: none !important;
 }
+.figure {
+  text-align: center;
+  margin: 2em 0;
+}
+.figure img {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 4px;
+}
+.figure .caption {
+  font-style: italic;
+  color: #555;
+  margin-top: 0.5em;
+}
