@@ -1,0 +1,23 @@
+---
+title: "RORB in barrel cortex"
+---
+
+The gene RORB plays a key role in the development of sensorimotor cortex in rodents. RORB expression leads axons from thalamic neurons to innervate layer 4 of the cortex. These thalamocortical projections organize into discrete "barrel" formations, each barrel containing the inputs from neurons responsive to a single whisker. 
+
+While it's generally assumed that there are no major differences between barrel formations in the left and right hemispheres ("laterality"), over the years there have been several histological studies suggesting age and sex-dependent hemispheric differences. Given the established role of RORB in barrel formation, one might want to test for age or sex-dependent laterality in RORB expression. 
+
+<h1> Preprocessing the raw data </h1>
+
+To test for effects of laterality in RORB expression, this example uses data collected from four male wild-type mice at two ages: postnatal day 12 (P12) and postnatal day 18 (P18). We started with raw, non-normalized mRNA counts from the cells within the primary sensorimotor cortex (S1), both left and right hemispheres. Before using any functions from wispack, we identified S1 in each sample by manually fitting the entire slice to CCFv3 and then extracting the S1 region.
+
+<div class="figure">
+  <img src="fig_S1_Rorb.png" alt="Image of horizontal mouse brain slice with primary sensorimotor cortex highlight and second image of the laminar and columnar axes of the cortex" width="90%">
+  <p class="caption">Left: Example horizontal slice as reconstructed from MERFISH data. Red highlight indicates the right primary sensorimotor cortex. Right: The right sensorimotor cortex, with RORB molecules in red and laminar and columnar axes labeled.</p>
+</div>
+
+As wisp can only model one dimension of spatial variation (at least, as-of the writing of this demo for v1.0), we need to identify this axis and transform the RORB molecule coordinates into it. This preprocessing also must be done outside of wispack. To do so, we wrote a custom coordinate transformation described in this [preprint](https://doi.org/10.1101/2025.06.11.659209) and available as code in this [repo](https://github.com/Oviedo-Lab/wspmm_methods.git) (see function cortical_coordinate_transform in script merfish_preprocessing.R). 
+
+<div class="figure">
+  <img src="fig_coordtrans.png" alt="Image showing the steps to transform coordinates from the CCFv3 registration to laminar and columnar axes" width="90%">
+  <p class="caption">Visualization of coordinate transform steps from initial CCFv3 registration to laminar and columnar axes.</p>
+</div>
