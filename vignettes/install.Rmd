@@ -8,9 +8,9 @@ title: "Installation instructions"
 4. To ensure a clean start, run:  
 
 ```bash
-rm -f src/*.o src/*.so  
-rm -rf wispack.Rcheck  
-rm -f wispack_*.tar.gz  
+rm -f src/*.o src/*.so
+rm -rf wispack.Rcheck
+rm -f wispack_*.tar.gz
 ./build_install.sh
 ```
 

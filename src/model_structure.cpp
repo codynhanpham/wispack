@@ -394,21 +394,63 @@ std::vector<IntegerVector> make_extrapolation_pool(
     std::vector<IntegerVector> extrapolation_pool(n_count);
     NumericVector bin_NumVec = to_NumVec(bin);
     
+    // Pre-make masks 
+    CharacterVector parent_lvls = Rcpp::unique(parent);
+    CharacterVector child_lvls = Rcpp::unique(child);
+    CharacterVector treatment_lvls = Rcpp::unique(treatment);
+    LogicalMatrix bin_masks(bin_NumVec.size(), Rcpp::max(bin_NumVec));
+    LogicalMatrix parent_masks(parent.size(), parent_lvls.size());
+    LogicalMatrix child_masks(child.size(), child_lvls.size());
+    LogicalMatrix treatment_masks(treatment.size(), treatment_lvls.size());
+    colnames(parent_masks) = parent_lvls;
+    colnames(child_masks) = child_lvls;
+    colnames(treatment_masks) = treatment_lvls;
+    for (int i = 0; i < bin_masks.ncol(); i++) {bin_masks.column(i) = eq_left_broadcast(bin_NumVec, i + 1);}
+    for (int i = 0; i < parent_lvls.size(); i++) {parent_masks.column(i) = eq_left_broadcast(parent, parent_lvls[i]);}
+    for (int i = 0; i < child_lvls.size(); i++) {child_masks.column(i) = eq_left_broadcast(child, child_lvls[i]);}
+    for (int i = 0; i < treatment_lvls.size(); i++) {treatment_masks.column(i) = eq_left_broadcast(treatment, treatment_lvls[i]);}
+    
     int n_rows = r_idx.size();
     IntegerVector tracker = iseq((int)(n_rows/5 - 1), n_rows - 1, 5); 
     for (int ri = 0; ri < n_rows; ri++) {
       int r = r_idx[ri];
       
-      // Find all rows with the same fixed effects and bin
-      LogicalVector mask = eq_left_broadcast(bin_NumVec, bin(r).val())
-        & eq_left_broadcast(parent, parent(r))
-        & eq_left_broadcast(child, child(r))
-        & eq_left_broadcast(treatment, treatment(r))
-        & nan_mask
-        & none_mask;
-      
-      // Save 
-      extrapolation_pool[r] = Rwhich(mask);
+      // Attempt to find interpolation pool
+      bool found_pool = false;
+      int bin_range = 1;
+      while(!found_pool) {
+        
+        // Find rows within the bin range 
+        LogicalVector bin_range_mask = bin_masks.column(bin(r).val() - 1);
+        for (int i = 1; i < bin_range; i++) {
+          bin_range_mask = bin_range_mask | bin_masks.column(std::max(0, (int)bin(r).val() - 1 - i));
+          bin_range_mask = bin_range_mask | bin_masks.column(std::min(bin_masks.ncol() - 1, (int)bin(r).val() - 1 + i));
+        }
+        
+        // Find all rows with the same fixed effects and bin
+        LogicalVector mask = bin_range_mask
+          & parent_masks.column(Rwhich(eq_left_broadcast(parent_lvls, parent(r)))[0])
+          & child_masks.column(Rwhich(eq_left_broadcast(child_lvls, child(r)))[0])
+          & treatment_masks.column(Rwhich(eq_left_broadcast(treatment_lvls, treatment(r)))[0])
+          & nan_mask
+          & none_mask;
+        
+        // Extract pool 
+        extrapolation_pool[r] = Rwhich(mask);
+        IntegerVector extrapolation_pool_r = extrapolation_pool[r];
+        
+        int extrapolation_sz = extrapolation_pool_r.size();
+        if (!(extrapolation_sz == 0 || extrapolation_pool_r[0] < 1)) {
+          found_pool = true;
+        } else {
+          bin_range++;
+        }
+        
+        if (bin_range > 10) {
+          Rcpp::stop("Error: could not find extrapolation pool for row " + std::to_string(r));
+        }
+        
+      }
       
       // Track progress
       if (any_true(eq_left_broadcast(tracker, ri))) {
@@ -433,30 +475,36 @@ sVec extrapolate_none(
     
     for (int r : r_idx) {
       
+      // Check if there is an extrapolation pool
       IntegerVector extrapolation_pool_r = extrapolation_pool[r];
       int extrapolation_sz = extrapolation_pool_r.size();
-      if (extrapolation_sz == 0 || extrapolation_pool_r[0] < 1) {Rcpp::stop("No extrapolation pool found for row " + std::to_string(r));}
-      sdouble running_sum = 0.0;
-      
-      if (log_transform) {
-        for (int i = 0; i < extrapolation_sz; i++) {
-          running_sum += slog(count[extrapolation_pool_r[i]] + 1.0);
+      if (!(extrapolation_sz == 0 || extrapolation_pool_r[0] < 1)) {
+        
+        sdouble running_sum = 0.0;
+        
+        // Take running sum
+        if (log_transform) {
+          for (int i = 0; i < extrapolation_sz; i++) {
+            running_sum += slog(count[extrapolation_pool_r[i]] + 1.0);
+          }
+        } else {
+          for (int i = 0; i < extrapolation_sz; i++) {
+            running_sum += count[extrapolation_pool_r[i]];
+          }
         }
-      } else {
-        for (int i = 0; i < extrapolation_sz; i++) {
-          running_sum += count[extrapolation_pool_r[i]];
+        
+        // Divide by size of pool and round
+        sdouble roundedMean;
+        if (log_transform) {
+          roundedMean = running_sum / (sdouble)extrapolation_sz;
+          roundedMean = sexp(roundedMean) - 1.0; // Convert back from log space
+          roundedMean = stan::math::round(roundedMean);
+        } else {
+          roundedMean = stan::math::round(running_sum / (sdouble)extrapolation_sz);
         }
+        count_out[r] = roundedMean;
+        
       }
-      
-      sdouble roundedMean;
-      if (log_transform) {
-        roundedMean = running_sum / (sdouble)extrapolation_sz;
-        roundedMean = sexp(roundedMean) - 1.0; // Convert back from log space
-        roundedMean = stan::math::round(roundedMean);
-      } else {
-        roundedMean = stan::math::round(running_sum / (sdouble)extrapolation_sz);
-      }
-      count_out[r] = roundedMean;
       
     }
     

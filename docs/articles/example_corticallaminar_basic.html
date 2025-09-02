@@ -5,13 +5,13 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>RORB in barrel cortex • wispack</title>
+<title>Example: RORB in barrel cortex • wispack</title>
 <script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
-<meta property="og:title" content="RORB in barrel cortex">
+<meta property="og:title" content="Example: RORB in barrel cortex">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -41,7 +41,7 @@
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Examples</h6></li>
     <li><a class="dropdown-item" href="../articles/example_2.html">Example 2</a></li>
-    <li><a class="dropdown-item" href="../articles/example_corticallaminar_basic.html">RORB in barrel cortex</a></li>
+    <li><a class="dropdown-item" href="../articles/example_corticallaminar_basic.html">Example: RORB in barrel cortex</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Legal</h6></li>
     <li><a class="dropdown-item" href="../articles/license.html">Dependency licenses</a></li>
@@ -67,7 +67,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>RORB in barrel cortex</h1>
+      <h1>Example: RORB in barrel cortex</h1>
             
       
 
@@ -90,13 +90,13 @@ for age or sex-dependent laterality in RORB expression.</p>
 <h1>
 Preprocessing the raw data
 </h1>
-<p>To test for effects of laterality in RORB expression, this example
-uses data collected from four male wild-type mice at two ages: postnatal
-day 12 (P12) and postnatal day 18 (P18). We started with raw,
-non-normalized mRNA counts from the cells within the primary
-sensorimotor cortex (S1), both left and right hemispheres. Before using
-any functions from wispack, we identified S1 in each sample by manually
-fitting the entire slice to CCFv3 and then extracting the S1 region.</p>
+<p>This example uses data collected from four male wild-type mice to
+test for age effects on laterality in RORB expression. The mice are
+split between two ages: postnatal day 12 (P12) and postnatal day 18
+(P18). We started with raw, non-normalized mRNA counts from the cells
+within the primary sensorimotor cortex (S1), both left and right
+hemispheres. Before using any functions from wispack, we identified S1
+in each sample by manually fitting the entire slice to the CCFv3.</p>
 <div class="figure">
 <img src="fig_S1_Rorb.png" alt="Image of horizontal mouse brain slice with primary sensorimotor cortex highlight and second image of the laminar and columnar axes of the cortex" width="90%"><p class="caption">
 Left: Example horizontal slice as reconstructed from MERFISH data. Red
@@ -161,11 +161,12 @@ RORB is known to be localized to L4, the other genes are also known to
 be localized to specific layers. So, the modeling results can be
 compared to known biology in all cases. Second, including multiple genes
 provides more implicit information for estimating things like random
-effects, and thus helps to avoid overfitting to any one gene.</p>
+effects, and thus helps to avoid overfitting to the noise of any one
+gene.</p>
 <p>Each row in the data frame represents a cell from the left or right
-S1 region of one of the four mice. Each cell being represented in
-multiple rows, one row per gene. Hence, we can find the number of cells
-by dividing by the number of genes.</p>
+S1 region of one of the four mice. Each cell is represented in multiple
+rows, one row per gene. Hence, we can find the number of cells by
+dividing by the number of genes.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">num_cells</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">countdata</span><span class="op">)</span><span class="op">/</span><span class="va">num_genes</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Number of cells:"</span>, <span class="va">num_cells</span>, <span class="st">"\n"</span><span class="op">)</span></span></code></pre></div>
@@ -175,6 +176,7 @@ the RNA species listed in the gene column, found in the cell represented
 by a given row. Each cell, of course, comes from a specific mouse and
 brain hemisphere, information given in the correspondingly named
 columns. The age column gives the age of the mouse.</p>
+<p>This leaves two columns to explain: cortex and bin.</p>
   </main>
 </div>
 

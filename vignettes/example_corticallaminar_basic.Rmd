@@ -8,7 +8,7 @@ While it's generally assumed that there are no major differences between barrel 
 
 <h1> Preprocessing the raw data </h1>
 
-To test for effects of laterality in RORB expression, this example uses data collected from four male wild-type mice at two ages: postnatal day 12 (P12) and postnatal day 18 (P18). We started with raw, non-normalized mRNA counts from the cells within the primary sensorimotor cortex (S1), both left and right hemispheres. Before using any functions from wispack, we identified S1 in each sample by manually fitting the entire slice to CCFv3 and then extracting the S1 region.
+This example uses data collected from four male wild-type mice to test for age effects on laterality in RORB expression. The mice are split between two ages: postnatal day 12 (P12) and postnatal day 18 (P18). We started with raw, non-normalized mRNA counts from the cells within the primary sensorimotor cortex (S1), both left and right hemispheres. Before using any functions from wispack, we identified S1 in each sample by manually fitting the entire slice to the CCFv3.
 
 <div class="figure">
   <img src="fig_S1_Rorb.png" alt="Image of horizontal mouse brain slice with primary sensorimotor cortex highlight and second image of the laminar and columnar axes of the cortex" width="90%">
@@ -51,9 +51,9 @@ Which genes?
 cat("Gene names:", paste0(unique(countdata$gene), collapse = ", "))
 ```
 
-These additional genes are included for two reasons. First, just as RORB is known to be localized to L4, the other genes are also known to be localized to specific layers. So, the modeling results can be compared to known biology in all cases. Second, including multiple genes provides more implicit information for estimating things like random effects, and thus helps to avoid overfitting to any one gene. 
+These additional genes are included for two reasons. First, just as RORB is known to be localized to L4, the other genes are also known to be localized to specific layers. So, the modeling results can be compared to known biology in all cases. Second, including multiple genes provides more implicit information for estimating things like random effects, and thus helps to avoid overfitting to the noise of any one gene. 
 
-Each row in the data frame represents a cell from the left or right S1 region of one of the four mice. Each cell being represented in multiple rows, one row per gene. Hence, we can find the number of cells by dividing by the number of genes. 
+Each row in the data frame represents a cell from the left or right S1 region of one of the four mice. Each cell is represented in multiple rows, one row per gene. Hence, we can find the number of cells by dividing by the number of genes. 
 
 ```{r n_cells}
 num_cells <- nrow(countdata)/num_genes
@@ -61,3 +61,5 @@ cat("Number of cells:", num_cells, "\n")
 ```
 
 Notice that the count column thus gives the number of molecules of the RNA species listed in the gene column, found in the cell represented by a given row. Each cell, of course, comes from a specific mouse and brain hemisphere, information given in the correspondingly named columns. The age column gives the age of the mouse. 
+
+This leaves two columns to explain: cortex and bin. The goal is to test for interacting effects of age and laterality, with mouse as a random effect grouping factor
