@@ -5,12 +5,15 @@ template:
 
 navbar:
   structure:
-    left:  [intro, articles, reference, tutorials, news]
+    left:  [intro, reference, articles, tutorials, news]
     right: [search, github, lightswitch]
   components:
     intro:
       text: Introduction
       href: index.html
+    reference:
+      text: Package Functions
+      href: reference/index.html
     github:
       icon: fab fa-github
       href: https://github.com/michaelbarkasi/wispack
