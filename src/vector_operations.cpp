@@ -629,3 +629,35 @@ IntegerVector vdiff(
     }
     return out;
   }
+
+#include <Rcpp.h>
+using namespace Rcpp;
+
+// Remove row from IntegerMatrix
+IntegerMatrix remove_row(
+    IntegerMatrix M, 
+    int i
+  ) {
+    int nrow = M.nrow();
+    int ncol = M.ncol();
+    
+    if (i < 0 || i >= nrow) stop("Row index out of range");
+   
+    IntegerMatrix out(nrow - 1, ncol);
+   
+    // Copy rows before i
+    for (int r = 0; r < i; r++) {
+      for (int c = 0; c < ncol; c++) {
+        out(r, c) = M(r, c);
+      }
+    } 
+    // Copy rows after i
+    for (int r = i + 1; r < nrow; r++) {
+      for (int c = 0; c < ncol; c++) {
+        out(r - 1, c) = M(r, c);
+      }
+    } 
+    
+    return out;
+  }
+ 

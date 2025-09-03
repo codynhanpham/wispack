@@ -641,6 +641,28 @@ sVec wspc::predict_rates(
           tpoint
         ); 
         
+        // STOPPED HERE; for debugging, try "all rows". Might be switching parent or child on a count NA row.
+        
+        // // TEMP for debugging
+        // if (predicted_rates(r) < rt_lower_bound) {
+        //   vprint(
+        //     "Neg rate: " + std::to_string(predicted_rates(r).val()) + 
+        //     ", row: " + std::to_string(r) + 
+        //     ", bin: " + std::to_string(bin(r).val()) + 
+        //     ", child: " + std::string(child[r]) + 
+        //     ", parent: " + std::string(parent[r]) + 
+        //     ", ran: " + std::string(ran[r]) + 
+        //     ", treatment: " + std::string(treatment[r]), 
+        //     true);
+        //   vprint("Rt: ", true);
+        //   vprintV(Rt, true);
+        //   vprint("tslope: ", true);
+        //   vprintV(tslope, true);
+        //   vprint("tpoint: ", true);
+        //   vprintV(tpoint, true);
+        //   vprint("f_pw: " + std::to_string(f_pw.val()) + ", f_rw: " + std::to_string(f_rw.val()) + ", f_sw: " + std::to_string(f_sw.val()), true);
+        // }
+        
       }
       
     }
@@ -671,7 +693,7 @@ sdouble wspc::neg_loglik(
     // Compute the log-likelihood of the count data, assuming a Poisson distribution with Gamma kernel for over-dispersion
     for (int r : count_not_na_idx) {
       
-      if (std::isinf(predicted_rates_log_var(r)) || predicted_rates_log_var(r) < 0.0 || std::isnan(predicted_rates_log_var(r))) {
+      if (std::isinf(predicted_rates_log_var(r)) || predicted_rates_log_var(r) < rt_lower_bound || std::isnan(predicted_rates_log_var(r))) {
         return sdouble(inf_);
       } else {
         
@@ -1740,9 +1762,24 @@ Rcpp::List wspc::check_parameter_feasibility(
         true            // compute all summed count rows, even with a count value of NA?
       );
       
+      // Test if provided parameters produce any nan rates
+      for (int i = 0; i < n_count_rows; i++) {
+        if (std::isnan(predicted_rates_log_var(i))) {
+          feasible = false;
+        }
+      }
+      
+      if (verbose) {
+        if (feasible) {
+          vprint("... no NAN rates predicted");
+        } else {
+          vprint("... NAN rates predicted");
+        }
+      }
+      
       // Test if provided parameters produce any negative rates
       for (int i = 0; i < n_count_rows; i++) {
-        if (predicted_rates_log_var(i) < 0 || std::isnan(predicted_rates_log_var(i))) {
+        if (!std::isnan(predicted_rates_log_var(i)) && predicted_rates_log_var(i) < rt_lower_bound) {
           feasible = false;
         }
       }
@@ -1750,10 +1787,10 @@ Rcpp::List wspc::check_parameter_feasibility(
       if (verbose) {
         if (feasible) {
           vprint("... no negative rates predicted");
-        } else {
+        } else { 
           vprint("... negative rates predicted");
         }
-      }
+      } 
       
     }
     

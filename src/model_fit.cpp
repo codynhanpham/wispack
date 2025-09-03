@@ -338,6 +338,7 @@ sdouble poly_sigmoid(
       return Rt(0);
     } else {
       sdouble ps = Rt(0);
+      if (Rt.size() < deg + 1) {Rcpp::stop("Error in poly_sigmoid: Rt.size() < deg + 1");}
       for (int i = 0; i < deg; i++) {
         if (std::isinf(Rt(i+1))) {
           return Rt(i+1);
@@ -624,20 +625,36 @@ IntegerMatrix LROcp_array(
       IntegerMatrix found_cp_array = project_cp(found_cp, centroid.column(1), loglik_ratio_array_midpass);
       // ... ^ in this matrix, rows are change points (by deg), columns are trt x ran interactions
      
+      IntegerVector collision_rows;
       for (int i = 0; i < found_cp_array.ncol(); i++) {
         found_cp_array.column(i) = found_cp_array.column(i) - 1;
         for (int k = 0; k < found_cp_array.nrow(); k++) {
-          if (found_cp_array(k, i) < ws) {found_cp_array(k, i) = ws;}
-          if (found_cp_array(k, i) > n_samples - ws) {found_cp_array(k, i) = n_samples - ws;}
+          if (found_cp_array(k, i) <= cp_buffer) {found_cp_array(k, i) = cp_buffer + 1;}
+          if (found_cp_array(k, i) >= n_samples - cp_buffer) {found_cp_array(k, i) = n_samples - cp_buffer - 1;}
           if (k > 0) {
             int cp_gap = found_cp_array(k, i) - found_cp_array(k - 1, i);
             if (cp_gap <= cp_buffer) {
               found_cp_array(k, i) = found_cp_array(k - 1, i) + cp_buffer + 1;
             }
-            if (found_cp_array(k, i) <= found_cp_array(k - 1, i)) {Rcpp::stop("Change point collision!");}
+            if (found_cp_array(k, i) <= found_cp_array(k - 1, i) || found_cp_array(k, i) > n_samples - cp_buffer) {
+              // Change point collision!
+              collision_rows.push_back(k);
+              }
           }
         }
       }
+      
+      // Remove collision rows
+      if (collision_rows.size() > 0) {
+        collision_rows = Rcpp::sort_unique(collision_rows); 
+        int n_collisions = collision_rows.size();
+        for (int i = 0; i < n_collisions; i++) {
+          int r = collision_rows[i];
+          found_cp_array = remove_row(found_cp_array, r);
+          collision_rows = collision_rows - 1; // after removing a row, all subsequent rows shift up by one
+        }
+      }
+      
       return found_cp_array;
       
     } else {
