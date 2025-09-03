@@ -766,9 +766,10 @@ dVec LROcp_logRatio(
 
 // Likelihood ratio outlier change-point detection, array input and output
 IntegerMatrix LROcp_array(
-    const sMat& series_array,       // 2D matrix of points to test for change points
-    const int& ws,                  // Running window size
-    const double& out_mult          // Outlier multiplier
+    const sMat& series_array,     // 2D matrix of points to test for change points
+    const int& ws,                // Running window size
+    const double& out_mult,       // Outlier multiplier
+    const double& cp_buffer       // Minimum distance between two change points
   );
 
 // Function to estimate block rate and transition slopes from count series and change points
@@ -784,6 +785,7 @@ List estimate_change_points(
     const sVec& bin,                               // bin data vector 
     const sVec& count_log,                         // log of count data vector
     const LogicalVector& count_not_na_mask,        // mask for non-NA counts
+    const double& cp_buffer,                       // minimum distance between two change points
     const int& ws,                                 // running window size
     const int& bin_num_i,                          // number of bins in the count data
     const double& LROcutoff,                       // cutoff for outlier detection in change-point detection

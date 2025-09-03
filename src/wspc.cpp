@@ -282,6 +282,13 @@ wspc::wspc(
     // Compute running and filter window sizes for LRO change-point detection
     ws = static_cast<int>(std::round(LROwindow_factor * (double)bin_num_i * buffer_factor.val()));
     
+    // Compute tpoint buffer
+    tpoint_buffer = bin_num * buffer_factor;
+    double tpoint_buffer_d = tpoint_buffer.val();
+    int tpoint_buffer_int = (int)tpoint_buffer_d;
+    if (tpoint_buffer_d != tpoint_buffer_int) {tpoint_buffer_int++;} 
+    tpoint_buffer = (sdouble)tpoint_buffer_int;
+    
     // Estimate gamma dispersion of raw counts
     List gamma_ests = compute_gamma_dispersion(
       count,
@@ -300,7 +307,8 @@ wspc::wspc(
     List cp_ests = estimate_change_points(
       bin,
       count_log,
-      count_not_na_mask,
+      count_not_na_mask, 
+      tpoint_buffer.val(),
       ws,
       bin_num_i,
       LROcutoff,
@@ -405,9 +413,6 @@ wspc::wspc(
       gv_fix_idx[r] = std::distance(child_lvls.begin(), it_fix);
     }
     vprint("Constructed grouping variable IDs", verbose);
-    
-    // Compute tpoint buffer
-    tpoint_buffer = bin_num * buffer_factor;
     
     // Compute size of the parameter boundary vector 
     for (int r : idx_mc_unique) {

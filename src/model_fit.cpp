@@ -571,9 +571,10 @@ dVec LROcp_logRatio(
 IntegerMatrix LROcp_array(
     const sMat& series_array,     // 2D matrix of points to test for change points
     const int& ws,                // Running window size
-    const double& out_mult        // Outlier multiplier
+    const double& out_mult,       // Outlier multiplier
+    const double& cp_buffer       // Minimum distance between two change points
   ) {
-    // The test here will treat each column of the matrix as a separate series. 
+    // Test treats each column of the matrix as a separate series. 
     //  It further assumes that the series are dependent on each other, and share 
     //  change points, plus some variance between them on the exact location. 
     
@@ -628,6 +629,13 @@ IntegerMatrix LROcp_array(
         for (int k = 0; k < found_cp_array.nrow(); k++) {
           if (found_cp_array(k, i) < ws) {found_cp_array(k, i) = ws;}
           if (found_cp_array(k, i) > n_samples - ws) {found_cp_array(k, i) = n_samples - ws;}
+          if (k > 0) {
+            int cp_gap = found_cp_array(k, i) - found_cp_array(k - 1, i);
+            if (cp_gap <= cp_buffer) {
+              found_cp_array(k, i) = found_cp_array(k - 1, i) + cp_buffer + 1;
+            }
+            if (found_cp_array(k, i) <= found_cp_array(k - 1, i)) {Rcpp::stop("Change point collision!");}
+          }
         }
       }
       return found_cp_array;
@@ -710,6 +718,7 @@ List estimate_change_points(
     const sVec& bin,                               // bin data vector 
     const sVec& count_log,                         // log of count data vector
     const LogicalVector& count_not_na_mask,        // mask for non-NA counts
+    const double& cp_buffer,                       // minimum distance between two change points
     const int& ws,                                 // running window size
     const int& bin_num_i,                          // number of bins in the count data
     const double& LROcutoff,                       // cutoff for outlier detection in change-point detection
@@ -723,8 +732,6 @@ List estimate_change_points(
     const CharacterVector& treatment_lvls,                      // all possible treatment combinations, levels as single-string name
     const std::vector<CharacterVector>& treatment_components    // all possible treatment combinations, level components
   ) {
-    
-    // degMat, found_cp
     
     // Grab number of parent and child levels
     const int n_ran = ran_lvls.size();
@@ -819,7 +826,8 @@ List estimate_change_points(
         IntegerMatrix found_cp_good = LROcp_array(
           count_masked_array_good,    // 2D matrix of points to test for change points (columns as series, rows as bins)
           ws,                         // running window size 
-          LROcutoff                   // points more than this times sd considered outliers
+          LROcutoff,                  // points more than this times sd considered outliers
+          cp_buffer                   // Minimum distance between two change points
         );
         
         // Estimate degree of this parent-child pair 
