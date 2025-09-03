@@ -376,7 +376,6 @@ List make_parameter_vector(
   }
 
 // Extrapolating random-effect free counts ("none's") ******************************************************************
-
 std::vector<IntegerVector> make_extrapolation_pool(
     const sVec& bin,
     const sVec& count, 
@@ -387,18 +386,26 @@ std::vector<IntegerVector> make_extrapolation_pool(
     bool verbose
   ) {
     
+    // Construct nan and none masks
     LogicalVector nan_mask = !Rcpp::is_na(to_NumVec(count));
     LogicalVector none_mask = !eq_left_broadcast(ran, "none");
+    
+    // Find indexes of none rows
     IntegerVector r_idx = Rwhich(!none_mask);
+    
+    // Initialze vector to hold extrapolation pools
     int n_count = count.size();
     std::vector<IntegerVector> extrapolation_pool(n_count);
-    NumericVector bin_NumVec = to_NumVec(bin);
     
-    // Pre-make masks 
+    // Convert bin vector to numeric and get max bin number
+    NumericVector bin_NumVec = to_NumVec(bin);
+    int max_bin = Rcpp::max(bin_NumVec);
+    
+    // Pre-make masks for bin, parent, child, and treatment levels
     CharacterVector parent_lvls = Rcpp::unique(parent);
     CharacterVector child_lvls = Rcpp::unique(child);
     CharacterVector treatment_lvls = Rcpp::unique(treatment);
-    LogicalMatrix bin_masks(bin_NumVec.size(), Rcpp::max(bin_NumVec));
+    LogicalMatrix bin_masks(bin_NumVec.size(), max_bin);
     LogicalMatrix parent_masks(parent.size(), parent_lvls.size());
     LogicalMatrix child_masks(child.size(), child_lvls.size());
     LogicalMatrix treatment_masks(treatment.size(), treatment_lvls.size());
@@ -410,6 +417,7 @@ std::vector<IntegerVector> make_extrapolation_pool(
     for (int i = 0; i < child_lvls.size(); i++) {child_masks.column(i) = eq_left_broadcast(child, child_lvls[i]);}
     for (int i = 0; i < treatment_lvls.size(); i++) {treatment_masks.column(i) = eq_left_broadcast(treatment, treatment_lvls[i]);}
     
+    // Loop through none rows and find their interpolation pools
     int n_rows = r_idx.size();
     IntegerVector tracker = iseq((int)(n_rows/5 - 1), n_rows - 1, 5); 
     for (int ri = 0; ri < n_rows; ri++) {
@@ -418,39 +426,17 @@ std::vector<IntegerVector> make_extrapolation_pool(
       // Attempt to find interpolation pool
       bool found_pool = false;
       int bin_range = 1;
-      while(!found_pool) {
-        
-        // Find rows within the bin range 
-        LogicalVector bin_range_mask = bin_masks.column(bin(r).val() - 1);
-        for (int i = 1; i < bin_range; i++) {
-          bin_range_mask = bin_range_mask | bin_masks.column(std::max(0, (int)bin(r).val() - 1 - i));
-          bin_range_mask = bin_range_mask | bin_masks.column(std::min(bin_masks.ncol() - 1, (int)bin(r).val() - 1 + i));
-        }
-        
-        // Find all rows with the same fixed effects and bin
-        LogicalVector mask = bin_range_mask
-          & parent_masks.column(Rwhich(eq_left_broadcast(parent_lvls, parent(r)))[0])
-          & child_masks.column(Rwhich(eq_left_broadcast(child_lvls, child(r)))[0])
-          & treatment_masks.column(Rwhich(eq_left_broadcast(treatment_lvls, treatment(r)))[0])
-          & nan_mask
-          & none_mask;
-        
-        // Extract pool 
-        extrapolation_pool[r] = Rwhich(mask);
-        IntegerVector extrapolation_pool_r = extrapolation_pool[r];
-        
-        int extrapolation_sz = extrapolation_pool_r.size();
-        if (!(extrapolation_sz == 0 || extrapolation_pool_r[0] < 1)) {
-          found_pool = true;
-        } else {
-          bin_range++;
-        }
-        
-        if (bin_range > 10) {
-          Rcpp::stop("Error: could not find extrapolation pool for row " + std::to_string(r));
-        }
-        
-      }
+      
+      // Find all rows with the same fixed effects and bin
+      LogicalVector mask = bin_masks.column(bin(r).val() - 1)
+        & parent_masks.column(Rwhich(eq_left_broadcast(parent_lvls, parent(r)))[0])
+        & child_masks.column(Rwhich(eq_left_broadcast(child_lvls, child(r)))[0])
+        & treatment_masks.column(Rwhich(eq_left_broadcast(treatment_lvls, treatment(r)))[0])
+        & nan_mask
+        & none_mask;
+     
+      // Extract pool 
+      extrapolation_pool[r] = Rwhich(mask);
       
       // Track progress
       if (any_true(eq_left_broadcast(tracker, ri))) {
@@ -475,11 +461,14 @@ sVec extrapolate_none(
     
     for (int r : r_idx) {
       
-      // Check if there is an extrapolation pool
+      
       IntegerVector extrapolation_pool_r = extrapolation_pool[r];
       int extrapolation_sz = extrapolation_pool_r.size();
-      if (!(extrapolation_sz == 0 || extrapolation_pool_r[0] < 1)) {
-        
+      if (extrapolation_sz == 0 || extrapolation_pool_r[0] < 1) {
+        // If no extrapolation pool, set to zero
+        count_out[r] = 0.0;
+      } else {
+        // If extrapolation pool found, take mean of pool
         sdouble running_sum = 0.0;
         
         // Take running sum
