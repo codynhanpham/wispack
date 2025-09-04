@@ -629,18 +629,18 @@ IntegerMatrix LROcp_array(
       for (int i = 0; i < found_cp_array.ncol(); i++) {
         found_cp_array.column(i) = found_cp_array.column(i) - 1;
         for (int k = 0; k < found_cp_array.nrow(); k++) {
-          if (found_cp_array(k, i) <= cp_buffer) {found_cp_array(k, i) = cp_buffer + 1;}
-          if (found_cp_array(k, i) >= n_samples - cp_buffer) {found_cp_array(k, i) = n_samples - cp_buffer - 1;}
           if (k > 0) {
             int cp_gap = found_cp_array(k, i) - found_cp_array(k - 1, i);
             if (cp_gap <= cp_buffer) {
               found_cp_array(k, i) = found_cp_array(k - 1, i) + cp_buffer + 1;
-            }
+              }
             if (found_cp_array(k, i) <= found_cp_array(k - 1, i) || found_cp_array(k, i) > n_samples - cp_buffer) {
               // Change point collision!
               collision_rows.push_back(k);
               }
           }
+          if (found_cp_array(k, i) <= cp_buffer) {found_cp_array(k, i) = cp_buffer + 1.0;}
+          if (found_cp_array(k, i) >= n_samples - cp_buffer) {found_cp_array(k, i) = n_samples - cp_buffer - 1.0;}
         }
       }
       
