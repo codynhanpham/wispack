@@ -600,8 +600,11 @@ sVec wspc::predict_rates(
     // Compute predicted rate for rows of the summed count data
     for (int r = 0; r < n_count_rows; r++) {
       
-      // Skip rows with NA values in count, if requested
-      if (count_not_na_mask[r] || all_rows) {
+      // Update predicted model components if r begins a new batch of unique values 
+      int cnt = std::count(mc_unique_rows.begin(), mc_unique_rows.end(), r);
+      
+      // Unless all_rows, only compute values for non-NA rows or rows that begin a new batch
+      if (count_not_na_mask[r] || cnt > 0 || all_rows) {
         
         // Grab warping factors
         if (gv_ran_idx[r] == 0) {
@@ -640,28 +643,6 @@ sVec wspc::predict_rates(
           tslope,
           tpoint
         ); 
-        
-        // STOPPED HERE; for debugging, try "all rows". Might be switching parent or child on a count NA row.
-        
-        // // TEMP for debugging
-        // if (predicted_rates(r) < rt_lower_bound) {
-        //   vprint(
-        //     "Neg rate: " + std::to_string(predicted_rates(r).val()) + 
-        //     ", row: " + std::to_string(r) + 
-        //     ", bin: " + std::to_string(bin(r).val()) + 
-        //     ", child: " + std::string(child[r]) + 
-        //     ", parent: " + std::string(parent[r]) + 
-        //     ", ran: " + std::string(ran[r]) + 
-        //     ", treatment: " + std::string(treatment[r]), 
-        //     true);
-        //   vprint("Rt: ", true);
-        //   vprintV(Rt, true);
-        //   vprint("tslope: ", true);
-        //   vprintV(tslope, true);
-        //   vprint("tpoint: ", true);
-        //   vprintV(tpoint, true);
-        //   vprint("f_pw: " + std::to_string(f_pw.val()) + ", f_rw: " + std::to_string(f_rw.val()) + ", f_sw: " + std::to_string(f_sw.val()), true);
-        // }
         
       }
       
@@ -709,7 +690,21 @@ sdouble wspc::neg_loglik(
         gamma_variance = delta_var_est(gamma_variance, pred_rate_var);
         
         // Analytic solution to the log of the integral from 0 to positive infinity of the Poisson times Gamma densities
-        log_lik += slog(poisson_gamma_integral(count_log(r), predicted_rates_log_var(r), gamma_variance));
+        if (gamma_variance == 0) { 
+          // if no over-dispersion, just use Poisson
+          log_lik += stan::math::poisson_lpmf(count_log(r), predicted_rates_log_var(r));
+          // ... for debugging
+          // if (std::isnan(stan::math::poisson_lpmf(count_log(r), predicted_rates_log_var(r)))) {
+          //   vprint("dPois Nan, count: " + std::to_string(count_log(r).val()) + ", rate: " + std::to_string(predicted_rates_log_var(r).val()), true); 
+          // }
+        } else { 
+          // otherwise, use Poisson-Gamma integral
+          log_lik += slog(poisson_gamma_integral(count_log(r), predicted_rates_log_var(r), gamma_variance));
+          // ... for debugging
+          // if (std::isnan(slog(poisson_gamma_integral(count_log(r), predicted_rates_log_var(r), gamma_variance)))) {
+          //   vprint("PGint Nan, count: " + std::to_string(count_log(r).val()) + ", rate: " + std::to_string(predicted_rates_log_var(r).val()) + ", var: " + std::to_string(gamma_variance.val()), true); 
+          // }
+        }
         
       }
       

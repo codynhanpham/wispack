@@ -145,7 +145,7 @@ sdouble dPois(
     return sexp(log_dPois(x, lambda));
   }
 
-// Integral of Poisson-Gamma distribution, from 1 to positive infinity
+// Integral of Poisson-Gamma distribution, from 0 to positive infinity
 sdouble poisson_gamma_integral(
     sdouble y, // observed count value
     sdouble r, // expected process rate drawn from the gamma distribution
