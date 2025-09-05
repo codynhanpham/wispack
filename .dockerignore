@@ -10,4 +10,5 @@ wispack.Rcheck/*
 .RData
 .Rhistory
 !.gitattributes
+
 .DS_Store

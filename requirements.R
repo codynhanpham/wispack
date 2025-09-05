@@ -13,6 +13,7 @@ load_libs <- function(bundle = "wispack") {
       "grid",
       "gridExtra",
       "colorspace",
+      "xml2",
       "roxygen2",
       "shiny",
       "shinyjs"

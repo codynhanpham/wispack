@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# On Linux, system dependencies are: libxml2 for roxygen2 && r-base-dev, libnlopt-dev (or libnlopt-cxx-dev) for Rcpp, RcppEigen, and StanHeaders
+# On Linux, system dependencies are: libxml2 (or libxml2-dev) for roxygen2 && r-base-dev, libnlopt-dev (or libnlopt-cxx-dev) for Rcpp, RcppEigen, and StanHeaders
 # Additionally, for PDF documentation generation, pdflatex should be installed
 #
-# sudo apt install libxml2 r-base-dev libnlopt-dev libnlopt-cxx-dev texlive-latex-base texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra
+# sudo apt install libxml2-dev r-base-dev libnlopt-dev libnlopt-cxx-dev texlive-latex-base texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra
 
 set -e  # Exit immediately if a command fails
 
