@@ -3,6 +3,12 @@
 load_libs <- function(bundle = "wispack") {
   if (length(bundle) == 1L && bundle == "wispack") {
     packages <- c(
+      "sass",
+      "fs",
+      "bslib",
+      "pkgload",
+      "shiny",
+      "shinyjs",
       "Rcpp",
       "RcppEigen",
       "methods",
@@ -14,8 +20,6 @@ load_libs <- function(bundle = "wispack") {
       "gridExtra",
       "colorspace",
       "roxygen2",
-      "shiny",
-      "shinyjs",
       "hdf5r"
     )
   }

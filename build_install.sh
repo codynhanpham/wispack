@@ -1,11 +1,18 @@
 #!/bin/bash
 
-# On Linux, system dependencies are: libxml2 for roxygen2 && r-base-dev, libnlopt-dev (or libnlopt-cxx-dev) for Rcpp, RcppEigen, and StanHeaders
+# On Linux, system dependencies are roughly:
+# - build-essential, r-base-dev, libxml2, and libxml2-dev for roxygen2 and package compilation
+# - libnlopt-dev (or libnlopt-cxx-dev) for Rcpp, RcppEigen, and StanHeaders
+# - libuv1-dev for fs
+# - libhdf5-dev for hdf5r
+# - libcurl4-gnutls-dev, libssl-dev, and curl for package downloads and HTTPS support
+# - texlive-latex-base, texlive-fonts-recommended, texlive-fonts-extra, and texlive-latex-extra for PDF documentation
+# - git and dos2unix for repository/bootstrap tooling
 # Additionally, for PDF documentation generation, pdflatex should be installed
 #
-# sudo apt install libxml2 r-base-dev libnlopt-dev libnlopt-cxx-dev texlive-latex-base texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra
-# 
-# And for hd5f functionality, need: sudo apt-get install libhdf5-dev
+# sudo apt install build-essential libcurl4-gnutls-dev curl git libuv1-dev libhdf5-dev libxml2 libxml2-dev libssl-dev r-base-dev libnlopt-dev libnlopt-cxx-dev texlive-latex-base texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra dos2unix
+
+
 
 set -e  # Exit immediately if a command fails
 
